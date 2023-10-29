@@ -1,0 +1,18 @@
+image: node:latest
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - npm install
+    - npm test
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    expire_in: 1 days
+    when: on_success
+    paths:
+      - node_modules/
