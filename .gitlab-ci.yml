@@ -1,18 +1,39 @@
-image: node:latest
+image: docker-latest
+
+variables:
+  REPOSITORY_URL: gilangfatahilah/todo-api
+  IMMAGE_TAG: latest
+
+services:
+  - docker:dind
+
+before_script:
+  - docker login --username=$DH_USERNAME --password=$DH_PASSWORD
 
 stages:
-  - test
+  - build
+  - deploy
 
-test:
-  stage: test
+build:
+  stage: build
   script:
-    - npm install
-    - npm test
-  cache:
-    paths:
-      - node_modules/
-  artifacts:
-    expire_in: 1 days
-    when: on_success
-    paths:
-      - node_modules/
+    - echo "Building Docker Image ..."
+    - docker build
+      -t todo-api:latest
+      --build-arg PORT=$PORT
+      --no cache .
+    - echo "Tagging Docker Image ..."
+    - docker tag todo-api:latest $REPOSITORY_URL:latest
+    - echo "Push Docker Image ..."
+    - docker push $REPOSITORY_URL:latest
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  script:
+    - docker stop todo-api || true && docker rm todo-api || true
+    - docker container run -dt -p $PORT:$PORT --name todo-api $REPOSITORY_URL:latest
+    - docker image prune -f
+  only:
+    - master
