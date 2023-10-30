@@ -87,12 +87,13 @@ describe("DELETE /todo/:id", () => {
   });
   it("should delete one item", async () => {
     const response = await request(app).delete(`/todo/${newTodo.id}`);
-    const findItem = await request(app).get(`/todo/${newTodo.id}`);
     expect(response.statusCode).toBe(200);
     expect(response.body.status).toBe("success");
     expect(response.body.id == newTodo.id).toBe(true);
-    // Check if items are deleted
-    expect(findItem.statusCode).toBe(404);
-    expect(findItem.body.success).toBe(false);
+  });
+  it("should not return the data after data has deleted", async () => {
+    const response = await request(app).get(`/todo/${newTodo.id}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body.success).toBe(false);
   });
 });
