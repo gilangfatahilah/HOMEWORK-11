@@ -21,7 +21,7 @@ build:
     - docker build
       -t todo-api:latest
       --build-arg PORT=$PORT
-      --no cache .
+      --no-cache .
     - echo "Tagging Docker Image ..."
     - docker tag todo-api:latest $REPOSITORY_URL:latest
     - echo "Push Docker Image ..."
